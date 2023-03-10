@@ -1,17 +1,25 @@
 import java.util.Scanner;
 
 public class TimeDuration {
-    
-    private int hour;
-    private int minute;
-    private int second;
-    public static int totalCreated = 0;
+    //secondssincemidnight allows for inputs higher than the next level, allowing an input of 1, 60, 60 to be converted to 2:01:00
+    private int secondssincemidnight = 0;
+    private static int totalCreated = 0;
 
     public TimeDuration(int hour, int minute, int second) {
         totalCreated++;
-        this.hour = hour;
-        this.minute = minute;
-        this.second = second;
+        secondssincemidnight = hour * 3600 + minute * 60 + second;
+    }
+
+    public int getHour() {
+        return secondssincemidnight / 3600;
+    }
+
+    public int getMinute() {
+        return secondssincemidnight % 3600 / 60;
+    }
+
+    public int getSecond() {   
+        return secondssincemidnight % 60;
     }
 
     public static TimeDuration parseFromString (String time) {
@@ -28,8 +36,8 @@ public class TimeDuration {
         if (time.indexOf(":") != -1) {
             String[] timeArray = time.split(":");
             if (timeArray.length == 3) {
-                 hour = Integer.parseInt(timeArray[0]);
-                 minute = Integer.parseInt(timeArray[1]);
+                hour = Integer.parseInt(timeArray[0]);
+                minute = Integer.parseInt(timeArray[1]);
                 second = Integer.parseInt(timeArray[2]);
                 return new TimeDuration(hour, minute, second);
             }
@@ -39,7 +47,7 @@ public class TimeDuration {
                 return new TimeDuration(hour, minute, second);
             }
             else {
-                System.err.println("Invalid time format | Usage: 1h 2m 3s OR 10:20:30");
+                System.err.println("Invalid time format | Example: 1h 2m 3s OR 10:20:30");
                 return null;
             }
         }
@@ -73,18 +81,29 @@ public class TimeDuration {
         return new TimeDuration(hour, minute, second);
     }
 
-    public String toString() {
-        String paddedminutes = minute < 10 ? "0" + minute : "" + minute;
-        String paddedseconds = second < 10 ? "0" + second : "" + second;
-        return hour + ":" + paddedminutes + ":" + paddedseconds;
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (other.getClass() != this.getClass()) {
+            return false;
+        }
+        TimeDuration otherTime = (TimeDuration) other;
+        return secondssincemidnight == otherTime.secondssincemidnight;
     }
+
+    public String toString() {
+        String paddedminutes = getMinute() < 10 ? "0" + getMinute() : "" + getMinute();
+        String paddedseconds = getSecond() < 10 ? "0" + getSecond() : "" + getSecond();
+        return getHour() + ":" + paddedminutes + ":" + paddedseconds;
+}
 
     public static void main(String[] args) {
         System.out.println(totalCreated);
         String[] test = {
             "1h",
             "1h 2m",
-            "1h 2m 3s",
+            "1h 2m, 3s",
             "10:2:30",
             "10:20",
             "10:2:3",
